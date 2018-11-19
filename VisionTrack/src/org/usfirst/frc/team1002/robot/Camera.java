@@ -18,12 +18,12 @@ import edu.wpi.first.wpilibj.Timer;
 public class Camera {
 	private UsbCamera mainCam;
 	private CvSink main;
-	public int frameNumber = 0;
+	private int frameNumber = 0;
 	private int frameWidth = 640;
 	private int frameHeight = 480;
 	private static double frameDelay = 0.05;
 	private static ArrayList<MatOfPoint> contours;
-	public boolean imageTracking = false;
+	private boolean imageTracking = false;
 
 	public void init() {
 		Thread cameraOpThread = new Thread(new Runnable() {
@@ -76,8 +76,8 @@ public class Camera {
 					for (int i = 0; i < numContours; i++) {
 						contour = contours.get(i);
 						box = Imgproc.boundingRect(contour);
-						xCenter = box.x + (box.width / 2);
-						yCenter = box.y + (box.height / 2);
+						xCenter += box.x + (box.width / 2);
+						yCenter += box.y + (box.height / 2);
 					}
 					xCenter /= numContours;
 					yCenter /= numContours;
@@ -91,6 +91,9 @@ public class Camera {
 			}
 			Timer.delay(frameDelay);
 		}
+	}
+	public void startTracking() {
+		imageTracking = true;
 	}
 
 }
