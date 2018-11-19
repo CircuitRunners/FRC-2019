@@ -12,7 +12,9 @@ public class Camera {
 	private UsbCamera mainCam;
 	private CvSink main;
 	public int frameNumber = 0;
-	// private static double frameDelay = 0.05;
+	private static double frameDelay = 0.05;
+	
+	public boolean imageTracking = false;
 
 	public void init() {
 		Thread cameraOpThread = new Thread(new Runnable() {
@@ -24,7 +26,7 @@ public class Camera {
 
 	protected void cameraOperation() {
 		frameNumber = 0;
-
+		
 		mainCam = CameraServer.getInstance().startAutomaticCapture("main", 0);// sets up camera
 		mainCam.setResolution(640, 480);
 		mainCam.setFPS(30);
@@ -38,8 +40,15 @@ public class Camera {
 		Mat camMat = new Mat();
 
 		while (!Thread.interrupted()) {
-			outputStream.putFrame(camMat);
-			Timer.delay(1 / 30);
+			if(!imageTracking) {
+				outputStream.putFrame(camMat);	
+			} else {
+				System.out.println("Camera is now vision tracking!");
+				
+			}
+			Timer.delay(frameDelay);
 		}
 	}
+	
+	
 }
