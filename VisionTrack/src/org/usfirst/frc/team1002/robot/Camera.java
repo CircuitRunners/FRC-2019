@@ -24,7 +24,7 @@ public class Camera {
 	private static double frameDelay = 0.05;
 	private static ArrayList<MatOfPoint> contours;
 	private boolean imageTracking = false;
-
+	
 	public void init() {
 		Thread cameraOpThread = new Thread(new Runnable() {
 			public void run() {
