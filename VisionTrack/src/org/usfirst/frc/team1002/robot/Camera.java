@@ -95,5 +95,8 @@ public class Camera {
 	public void startTracking() {
 		imageTracking = true;
 	}
+	public void stopTracking() {
+		imageTracking = false;
+	}
 
 }
