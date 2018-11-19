@@ -37,7 +37,9 @@ public class Camera {
 
 	protected void cameraOperation() {
 		frameNumber = 0;
+		
 		GripPipeline gripProcessor = new GripPipeline();
+		
 		boolean targetFound = false;
 		int numContours = 0;
 		int xCenter = 0;
