@@ -14,18 +14,19 @@ import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Camera {
-	private UsbCamera mainCam;
-	private CvSink main;
-	private int frameNumber = 0;
-	private int frameWidth = 640;
-	private int frameHeight = 480;
+	private static UsbCamera mainCam;
+	private static CvSink main;
+	private static int frameNumber = 0;
+	private static int frameWidth = 640;
+	private static int frameHeight = 480;
 	private static double frameDelay = 0.05;
 	private static ArrayList<MatOfPoint> contours;
-	private boolean imageTracking = false;
-	
-	public void init() {
+	private static boolean imageTracking = false;
+	static boolean debug = true;
+	public static void init() {
 		Thread cameraOpThread = new Thread(new Runnable() {
 			public void run() {
 				cameraOperation();
@@ -35,7 +36,7 @@ public class Camera {
 		cameraOpThread.start();
 	}
 
-	protected void cameraOperation() {
+	protected static void cameraOperation() {
 		frameNumber = 0;
 		
 		GripPipeline gripProcessor = new GripPipeline();
@@ -86,7 +87,11 @@ public class Camera {
 					
 					xAngle = ((xCenter - (frameWidth / 2)) / (frameWidth / 2)) * CamData.horizontalFOV;
 					yAngle = ((yCenter - (frameWidth / 2)) / (frameWidth / 2)) * CamData.verticalFOV;
-					
+
+					if(debug) {
+						SmartDashboard.putNumber("X Angle", xAngle);
+						SmartDashboard.putNumber("Y Angle", yAngle);
+					}
 					Imgproc.circle(camMat, new Point(xCenter, yCenter), 15, new Scalar(235, 55, 15), 2);
 					targetFound = true;
 				}
@@ -94,10 +99,10 @@ public class Camera {
 			Timer.delay(frameDelay);
 		}
 	}
-	public void startTracking() {
+	public static void startTracking() {
 		imageTracking = true;
 	}
-	public void stopTracking() {
+	public static void stopTracking() {
 		imageTracking = false;
 	}
 
