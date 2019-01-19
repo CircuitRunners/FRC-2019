@@ -20,10 +20,8 @@ public class MyCamera{
     private static UsbCamera camServer;
 	private static CvSink camSink;
 	private static CvSource liveFeed;
-	private static CvSource moddedLiveFeed;
 	private static Mat mat;
-	private static Mat filteredMat;
-    private static int frameNumber = 0;
+	private static int frameNumber = 0;
 	private static int frameWidth = 640;
 	private static int frameHeight = 480;
     //private static double frameDelay = 0.05;
@@ -66,11 +64,9 @@ public class MyCamera{
 		gripProcessor = new GripPipeline();
 		camSink = CameraServer.getInstance().getVideo(camServer);
 		liveFeed = CameraServer.getInstance().putVideo("Live", frameWidth, frameHeight);
-		moddedLiveFeed = CameraServer.getInstance().putVideo("Trackng",frameWidth,frameHeight);
 		camServer.setBrightness(10);
 		camServer.setExposureManual(10);
 		mat = new Mat();
-		filteredMat = new Mat();
 
 		while (!Thread.interrupted()) {
 			if (camSink.grabFrame(mat) == 0) {
@@ -80,13 +76,14 @@ public class MyCamera{
 				liveFeed.putFrame(mat);
 				SmartDashboard.putNumber("Frame#:",++frameNumber);
 			}
-			if (!imageTracking) { 
+			if (!imageTracking) {
+				liveFeed.putFrame(mat); 
 			} else {
                 targetFound = false;
                 gripProcessor.process(mat);
-				contours = gripProcessor.findContoursOutput();
+				contours = gripProcessor.filterContoursOutput();
 				numContours = contours.size();
-				System.out.println("I Ran!");
+				
 				SmartDashboard.putNumber("NumContours", numContours);
 				if (numContours > 2) {
 					numContours = 2;
@@ -96,8 +93,6 @@ public class MyCamera{
 					for (int i = 0; i < numContours; i++) {
 						contour = contours.get(i);
 						box = Imgproc.boundingRect(contour);
-						contour.assignTo(filteredMat);
-						moddedLiveFeed.putFrame(filteredMat);
 						xCenter += box.x + (box.width / 2);
 						yCenter += box.y + (box.height / 2);
 					}
@@ -108,14 +103,13 @@ public class MyCamera{
 					yAngle = ((yCenter - (frameWidth / 2)) / (frameWidth / 2)) * verticalFOV;
 
 					
-						SmartDashboard.putNumber("X Angle", xAngle);
-						SmartDashboard.putNumber("Y Angle", yAngle);
+					SmartDashboard.putNumber("X Angle", xAngle);
+					SmartDashboard.putNumber("Y Angle", yAngle);
 					
 					Imgproc.circle(mat, new Point(xCenter, yCenter), 15, new Scalar(235, 55, 15), 2);
 					targetFound = true;
 				}
 			}
-			//moddedLiveFeed.putFrame(mat);
 			Timer.delay(1/30);
 		}
     }
