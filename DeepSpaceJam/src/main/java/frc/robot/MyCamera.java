@@ -26,7 +26,7 @@ public class MyCamera{
     private static int frameNumber = 0;
 	private static int frameWidth = 640;
 	private static int frameHeight = 480;
-    private static double frameDelay = 0.05;
+    //private static double frameDelay = 0.05;
     
     public static final double verticalFOV = 33.583;//half of the FOV (center to edge)
 	public static final double horizontalFOV = 59.703;//half of the FOV (center to edge)
@@ -49,16 +49,7 @@ public class MyCamera{
 		cameraOpThread.setDaemon(true);
 		cameraOpThread.start();
 
-		camServer = CameraServer.getInstance().startAutomaticCapture("cam",0);
-		camServer.setResolution(640,480);
-		gripProcessor = new GripPipeline();
-		camSink = CameraServer.getInstance().getVideo(camServer);
-		liveFeed = CameraServer.getInstance().putVideo("Live", frameWidth, frameHeight);
-		moddedLiveFeed = CameraServer.getInstance().putVideo("Trackng",frameWidth,frameHeight);
-		camServer.setBrightness(10);
-		camServer.setExposureManual(10);
-		mat = new Mat();
-		filteredMat = new Mat();
+		
 	}
 
 	static boolean targetFound = false;
@@ -70,7 +61,17 @@ public class MyCamera{
 
     protected static void cameraOperation() {
 		frameNumber = 0;
-		    
+		camServer = CameraServer.getInstance().startAutomaticCapture("cam",0);
+		camServer.setResolution(640,480);
+		gripProcessor = new GripPipeline();
+		camSink = CameraServer.getInstance().getVideo(camServer);
+		liveFeed = CameraServer.getInstance().putVideo("Live", frameWidth, frameHeight);
+		moddedLiveFeed = CameraServer.getInstance().putVideo("Trackng",frameWidth,frameHeight);
+		camServer.setBrightness(10);
+		camServer.setExposureManual(10);
+		mat = new Mat();
+		filteredMat = new Mat();
+
 		while (!Thread.interrupted()) {
 			if (camSink.grabFrame(mat) == 0) {
 				liveFeed.notifyError(camSink.getError());
@@ -83,7 +84,7 @@ public class MyCamera{
 			} else {
                 targetFound = false;
                 gripProcessor.process(mat);
-				contours = gripProcessor.filterContoursOutput();
+				contours = gripProcessor.findContoursOutput();
 				numContours = contours.size();
 				System.out.println("I Ran!");
 				SmartDashboard.putNumber("NumContours", numContours);

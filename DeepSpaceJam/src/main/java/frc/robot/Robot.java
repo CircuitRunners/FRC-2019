@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
 
   XboxController driver = new XboxController(0);
   Drivebase drive = new Drivebase();
-  Compressor c = new Compressor(0);
+  //Compressor c = new Compressor(0);
 
   boolean isTracking = false;
   /**
