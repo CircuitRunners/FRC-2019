@@ -46,8 +46,6 @@ public class MyCamera{
 		cameraOpThread.setName("CamThread");
 		cameraOpThread.setDaemon(true);
 		cameraOpThread.start();
-
-		
 	}
 
 	static boolean targetFound = false;
@@ -72,8 +70,7 @@ public class MyCamera{
 			if (camSink.grabFrame(mat) == 0) {
 				liveFeed.notifyError(camSink.getError());
 			} else {
-
-				liveFeed.putFrame(mat);
+				//liveFeed.putFrame(mat);
 				SmartDashboard.putNumber("Frame#:",++frameNumber);
 			}
 			if (!imageTracking) {
@@ -98,11 +95,12 @@ public class MyCamera{
 					}
 					xCenter /= numContours;
 					yCenter /= numContours;
-					
-					xAngle = ((xCenter - (frameWidth / 2)) / (frameWidth / 2)) * horizontalFOV;
-					yAngle = ((yCenter - (frameWidth / 2)) / (frameWidth / 2)) * verticalFOV;
+					SmartDashboard.putNumber("X Center", xCenter);
+					SmartDashboard.putNumber("Y Center", yCenter);
 
-					
+					xAngle = ((xCenter - (frameWidth / 2)) / (frameWidth / 2)) * horizontalFOV;
+					yAngle = ((yCenter - (frameHeight / 2)) / (frameHeight / 2)) * verticalFOV;
+				
 					SmartDashboard.putNumber("X Angle", xAngle);
 					SmartDashboard.putNumber("Y Angle", yAngle);
 					
