@@ -8,7 +8,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -20,11 +22,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * project.
  */
 public class Robot extends TimedRobot {
-
   XboxController driver = new XboxController(0);
   Drivebase drive = new Drivebase();
   //Compressor c = new Compressor(0);
-
+  Joystick jumpBtn = new Joystick(1);
   boolean isTracking = false;
   /**
    * This function is run when the robot is first started up and should be
@@ -96,6 +97,11 @@ public class Robot extends TimedRobot {
     } else if(driver.getBButton()){
       MyCamera.stopTracking();
       isTracking = false;
+    }
+    if(Timer.getMatchTime()<30){
+      if(0 == 1/*some button*/){
+        HabClimber.raise(Timer.getMatchTime()<30);
+      }
     }
   }
 
