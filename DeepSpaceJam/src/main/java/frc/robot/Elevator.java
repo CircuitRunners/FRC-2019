@@ -18,26 +18,29 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
  */
 public class Elevator {
     private static TalonSRX elevator;
+    private static int currentPosition = 0;
     public static void init(){
         elevator = new TalonSRX(9);
         elevator.clearStickyFaults();
+        talonConfig(elevator,false);
     }
     public static void run(){
         
     }
-    int elevTimeoutMs = 10;
-    int elevPIDLoopIdx = 0;
-    int elevSlotIdx = 0;
-    int elevCV = 15000;
-    int maxElevCV = 18000;
-    int elevCA = 15000;
-    int maxElevCA = 18000;
-    public void talonConfig(TalonSRX thisTalon, boolean inverted) {
+
+    static int elevTimeoutMs = 10;
+    static int elevPIDLoopIdx = 0;
+    static int elevSlotIdx = 0;
+    static int elevCV = 15000;
+    static int maxElevCV = 18000;
+    static int elevCA = 15000;
+    static int maxElevCA = 18000;
+    public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
 		/* first choose the sensor */
 		thisTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, elevPIDLoopIdx,
 				elevTimeoutMs);
-		thisTalon.setSensorPhase(true);
-		thisTalon.setInverted(false);
+		thisTalon.setSensorPhase(!inverted);
+		thisTalon.setInverted(inverted);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
 		thisTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, elevTimeoutMs);
@@ -64,5 +67,13 @@ public class Elevator {
 		//thisTalon.configMotionCruiseVelocity((int) RobotData.elevCruiseVel, elevTimeoutMs);
 		//thisTalon.configMotionAcceleration((int) RobotData.elevCruiseAccel, elevTimeoutMs);
 
-	}
+    }
+    
+    private static void move(double position){
+        if(position != currentPosition){
+            if(position < currentPosition){
+
+            }
+        }
+    }
 }
