@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -24,8 +25,11 @@ public class Elevator {
         elevator.clearStickyFaults();
         talonConfig(elevator,false);
     }
-    public static void run(){
-        
+    public static void run(double triggerInfo){
+        if(Math.abs(triggerInfo) >0.1){
+            currentPosition += 10 * triggerInfo;
+        }
+        move(currentPosition);
     }
 
     static int elevTimeoutMs = 10;
@@ -35,6 +39,7 @@ public class Elevator {
     static int maxElevCV = 18000;
     static int elevCA = 15000;
     static int maxElevCA = 18000;
+
     public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
 		/* first choose the sensor */
 		thisTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, elevPIDLoopIdx,
@@ -68,12 +73,18 @@ public class Elevator {
 		//thisTalon.configMotionAcceleration((int) RobotData.elevCruiseAccel, elevTimeoutMs);
 
     }
-    
+    private static int maxHeight = 200; //inches
     private static void move(double position){
         if(position != currentPosition){
-            if(position < currentPosition){
-
+            if(position > toClicks(maxHeight)){
+                elevator.set(ControlMode.MotionMagic,toClicks(maxHeight));
             }
         }
+    }
+    private static double toInches(int i){
+        return  (i / 990.0);
+    }
+    private static double toClicks(int j){
+        return (j * 990.0);
     }
 }
