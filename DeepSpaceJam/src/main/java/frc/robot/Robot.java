@@ -23,10 +23,9 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Robot extends TimedRobot {
   XboxController driver = new XboxController(0);
-  Drivebase drive = new Drivebase();
   //Compressor c = new Compressor(0);
   Joystick jumpBtn = new Joystick(1);
-  boolean isTracking = false;
+  
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -35,7 +34,11 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     MyCamera.debug = true;
     MyCamera.init();
-    drive.init();
+    Drivebase.init();
+    Elevator.init();
+    Wrist.init();
+    Intake.init();
+    HabClimber.init();
   }
 
   /**
@@ -48,7 +51,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putString("Tracking Systems: ", isTracking? "Enabled":"Disabled");
     SmartDashboard.putNumber("correction angle", MyCamera.xAngle);
   }
 
@@ -72,18 +74,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    if(driver.getAButton()){
-      MyCamera.startTracking();
-      isTracking = true;
-    } else{
-      MyCamera.stopTracking();
-      isTracking = false; 
-    }
-   if(MyCamera.isTracking()){
-      drive.autoDrive(.25+MyCamera.xAngle, .25-MyCamera.xAngle);
-   } else {
-     drive.drive(driver.getRawAxis(Xbox.AXIS_LEFTY),driver.getRawAxis(Xbox.AXIS_RIGHTY));
-   }
+    getControllers();
   }
 
   /**
@@ -91,18 +82,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    if(driver.getAButton()){
-      MyCamera.startTracking();
-      isTracking = true;
-    } else if(driver.getBButton()){
-      MyCamera.stopTracking();
-      isTracking = false;
-    }
-    if(Timer.getMatchTime()<30){
-      if(0 == 1/*some button*/){
-        HabClimber.raise(Timer.getMatchTime()<30);
-      }
-    }
+    getControllers();
   }
 
   /**
@@ -110,5 +90,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+  }
+  private void getControllers(){
+    if(driver.getAButton()){
+      MyCamera.startTracking();
+    } else{
+      MyCamera.stopTracking();
+    }
+   if(MyCamera.isTracking()){
+      Drovebase.drive(.25+(MyCamera.xAngle/30), .25-(MyCamera.xAngle/30);
+   } else {
+     drive.drive(driver.getRawAxis(Xbox.AXIS_LEFTY),driver.getRawAxis(Xbox.AXIS_RIGHTY));
+   }
   }
 }

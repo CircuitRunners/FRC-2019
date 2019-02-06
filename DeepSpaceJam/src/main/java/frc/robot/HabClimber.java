@@ -8,7 +8,7 @@ public class HabClimber{
     static DoubleSolenoid backLeft;
     static DoubleSolenoid backRight;
 
-    public void init(){
+    public static void init(){
         frontLeft = new DoubleSolenoid(1, 2);
         frontRight = new DoubleSolenoid(3,4);
         backLeft = new DoubleSolenoid(5,6);
