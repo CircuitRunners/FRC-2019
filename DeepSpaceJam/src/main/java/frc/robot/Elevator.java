@@ -9,6 +9,8 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -39,6 +41,7 @@ public class Elevator {
     static int maxElevCV = 18000;
     static int elevCA = 15000;
     static int maxElevCA = 18000;
+    
 
     public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
 		/* first choose the sensor */
@@ -68,7 +71,8 @@ public class Elevator {
 		thisTalon.configMotionAcceleration(elevCV, elevTimeoutMs);
 		/* zero the sensor */
 		thisTalon.setSelectedSensorPosition(0, elevPIDLoopIdx, elevTimeoutMs);
-
+        thisTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,LimitSwitchNormal.NormallyOpen);
+        thisTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,LimitSwitchNormal.NormallyOpen);
 		//thisTalon.configMotionCruiseVelocity((int) RobotData.elevCruiseVel, elevTimeoutMs);
 		//thisTalon.configMotionAcceleration((int) RobotData.elevCruiseAccel, elevTimeoutMs);
 
@@ -79,6 +83,7 @@ public class Elevator {
             if(position > toClicks(maxHeight)){
                 elevator.set(ControlMode.MotionMagic,toClicks(maxHeight));
             }
+            
         }
     }
     private static double toInches(int i){
