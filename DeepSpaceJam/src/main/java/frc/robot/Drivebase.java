@@ -7,10 +7,6 @@ public class Drivebase{
      private static VictorSP left1,left2,left3,right1,right2,right3;
      private static SpeedControllerGroup left,right;
 
-    private static final int IDLE = 100;
-    private static final int AUTO = 101;
-    private static final int TELEOP = 102;
-    private static int JOB = IDLE;
     public static void init(){
         left1 = new VictorSP(0);
         left2 = new VictorSP(1);
@@ -20,37 +16,12 @@ public class Drivebase{
         right3 = new VictorSP(5);
         left = new SpeedControllerGroup(left1,left2,left3);
         right = new SpeedControllerGroup(right1,right2,right3);
-    }
-    public boolean isIdle(){
-        return(JOB == IDLE);
-    }
-    public void CheckStatus(){
-        switch(JOB){
-            case IDLE:
-        
-            break;
-            case AUTO:
-            trackingCheckStatus();
-            break;
-            case TELEOP:
-            operatorCheckStatus();
-            break;
-        }
-        
-    }
-    public void trackingCheckStatus(){
-
-    }
-    public void operatorCheckStatus(){
-
-    }
-    public void startTracking(){
-        JOB = AUTO;
+        left.setInverted(true);
     }
 
-    double prev_left = 0;
-    double prev_right = 0;
-    public void drive(double l, double r){
+    private static double prev_left = 0;
+    private static double prev_right = 0;
+    public static void drive(double l, double r){
         //write/copy in drive code smoothing and safety methods
         l = smooth(l, 0.1,0.9);
         r = smooth(r,0.1,0.9);
@@ -61,7 +32,7 @@ public class Drivebase{
         left.set(l);
         right.set(r);
     }
-    private double safety(double cmdVal, double prevVal, double maxChange) {
+    private static double safety(double cmdVal, double prevVal, double maxChange) {
 		double diff = cmdVal - prevVal;
 		if (Math.abs(diff) < maxChange) {
 			return cmdVal;

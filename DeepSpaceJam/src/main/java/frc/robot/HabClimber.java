@@ -1,34 +1,35 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 
 public class HabClimber{
-    static DoubleSolenoid frontLeft;
-    static DoubleSolenoid frontRight;
-    static DoubleSolenoid backLeft;
-    static DoubleSolenoid backRight;
-
-    public static void init(){
-        frontLeft = new DoubleSolenoid(1, 2);
-        frontRight = new DoubleSolenoid(3,4);
-        backLeft = new DoubleSolenoid(5,6);
-        backRight = new DoubleSolenoid(7,8);
-
-    }
-    public static void raise(boolean endGame){
-        if(endGame){
-            frontLeft.set(DoubleSolenoid.Value.kForward);
-            backLeft.set(DoubleSolenoid.Value.kForward);
-            frontRight.set(DoubleSolenoid.Value.kForward);
-            backRight.set(DoubleSolenoid.Value.kForward);
-        } else {
-            System.out.println("Not Endgame Yet!!!");
+        private static Solenoid front;
+        private static Solenoid back;
+        public static final int FRONT = 1;
+        public static final int BACK = 2;
+        public static final int BOTH = 3;
+        public static void init(){
+            front = new Solenoid(0);
+            back = new Solenoid(1);
         }
-    }
-    public static void lower(){
-        frontLeft.set(DoubleSolenoid.Value.kReverse);
-        backLeft.set(DoubleSolenoid.Value.kReverse);
-        frontRight.set(DoubleSolenoid.Value.kReverse);
-        backRight.set(DoubleSolenoid.Value.kReverse); 
-    }
+        public static void raise(int pos){
+            if(pos == FRONT){
+            front.set(true);
+            } else if(pos == BACK){
+                back.set(true);
+            } else if(pos == BOTH){
+                front.set(true);
+                back.set(true);
+            }
+        }
+        public static void lower(int pos){
+            if(pos == FRONT){
+            front.set(false);
+            } else if(pos == BACK){
+                back.set(false);
+            } else if(pos == BOTH){
+                front.set(false);
+                back.set(false); 
+            }
+        }
 }

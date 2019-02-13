@@ -22,9 +22,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * project.
  */
 public class Robot extends TimedRobot {
-  XboxController driver = new XboxController(0);
+  static XboxController driver = new XboxController(0);
+  static XboxController operator = new XboxController(1);
   //Compressor c = new Compressor(0);
-  Joystick jumpBtn = new Joystick(1);
+  //Joystick jumpBtn = new Joystick(1);
   
   /**
    * This function is run when the robot is first started up and should be
@@ -35,8 +36,8 @@ public class Robot extends TimedRobot {
     MyCamera.debug = true;
     MyCamera.init();
     Drivebase.init();
-    Elevator.init();
-    Wrist.init();
+    //Elevator.init();
+    //Wrist.init();
     Intake.init();
     HabClimber.init();
   }
@@ -98,9 +99,13 @@ public class Robot extends TimedRobot {
       MyCamera.stopTracking();
     }
    if(MyCamera.isTracking()){
-      Drovebase.drive(.25+(MyCamera.xAngle/30), .25-(MyCamera.xAngle/30);
+      Drivebase.drive(.25+(MyCamera.xAngle/30), .25-(MyCamera.xAngle/30));
    } else {
-     drive.drive(driver.getRawAxis(Xbox.AXIS_LEFTY),driver.getRawAxis(Xbox.AXIS_RIGHTY));
+     Drivebase.drive(driver.getRawAxis(Xbox.AXIS_LEFTY),driver.getRawAxis(Xbox.AXIS_RIGHTY));
+   }
+   //HabCLimber Controls
+   if(operator.getBumper(GenericHID.Hand.kLeft) && operator.getBumper(GenericHID.Hand.kRight)){
+     Autonomous.beginClimb();
    }
   }
 }

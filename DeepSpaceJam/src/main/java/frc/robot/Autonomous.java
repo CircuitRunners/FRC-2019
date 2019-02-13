@@ -29,11 +29,14 @@ public class Autonomous {
             break;
         }  
     }
+    public static void beginClimb(){
+        mode = MODE_CLIMB;
+    }
     private static int step = 0;
     private static void climb(){
         switch(step){
           case 1:
-          HabClimber.raise(true);
+          HabClimber.raise(HabClimber.BOTH);
           step++;
           break;  
           case 2:
@@ -41,7 +44,10 @@ public class Autonomous {
           step++;
           break;
           case 3:
+          Intake.in(3);
           step++;
+          case 4:
+
           break;
         }
 

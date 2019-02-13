@@ -74,7 +74,7 @@ public class MyCamera{
 				SmartDashboard.putNumber("Frame#:",++frameNumber);
 			}
 			if (!imageTracking) {
-				liveFeed.putFrame(mat); 
+				//liveFeed.putFrame(mat); 
 			} else {
                 targetFound = false;
                 gripProcessor.process(mat);
