@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 public class Drivebase{
      private static VictorSP left1,left2,left3,right1,right2,right3;
      private static SpeedControllerGroup left,right;
-
+    private static boolean selfDriving = false;
     public static void init(){
         left1 = new VictorSP(0);
         left2 = new VictorSP(1);
@@ -53,5 +53,14 @@ public class Drivebase{
 			return 0;
 		else
 			return aValue * aValue * aValue * (value / aValue);
-	}
+    }
+    public static boolean operatorControlled(){
+        return !selfDriving;
+    }
+    public static void selfDrive(){
+        selfDriving = true;
+    }
+    public static void returnControl(){
+        selfDriving = false;
+    }
 }

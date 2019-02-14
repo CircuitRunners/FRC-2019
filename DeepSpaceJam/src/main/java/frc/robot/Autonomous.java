@@ -36,19 +36,15 @@ public class Autonomous {
     private static void climb(){
         switch(step){
           case 1:
-          HabClimber.raise(HabClimber.BOTH);
+          Wrist.unflop();
           step++;
-          break;  
+          break;
           case 2:
-          Wrist.flop();
+          Elevator.goToLvl1();
           step++;
           break;
           case 3:
-          Intake.in(3);
-          step++;
-          case 4:
-
-          break;
+          HabClimber.raise(HabClimber.BOTH);
         }
 
     }   

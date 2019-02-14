@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -76,6 +77,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     getControllers();
+    //Elevator.run(operator.getTriggerAxis(Hand.kLeft), operator.getTriggerAxis(Hand.kRight));
   }
 
   /**
@@ -92,20 +94,33 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
   }
+  static boolean flopped = false;
   private void getControllers(){
-    if(driver.getAButton()){
+    //tracking controls
+    if(driver.getAButton() || !Drivebase.operatorControlled()){
       MyCamera.startTracking();
-    } else{
+    } else {
       MyCamera.stopTracking();
     }
-   if(MyCamera.isTracking()){
+    //drive controls
+   if(MyCamera.isTracking() && !Drivebase.operatorControlled()){
       Drivebase.drive(.25+(MyCamera.xAngle/30), .25-(MyCamera.xAngle/30));
    } else {
      Drivebase.drive(driver.getRawAxis(Xbox.AXIS_LEFTY),driver.getRawAxis(Xbox.AXIS_RIGHTY));
    }
-   //HabCLimber Controls
-   if(operator.getBumper(GenericHID.Hand.kLeft) && operator.getBumper(GenericHID.Hand.kRight)){
+   //HabClimber Controls
+   if(operator.getBumper(Hand.kLeft) && operator.getBumper(Hand.kRight) && driver.getBumper(Hand.kLeft) && driver.getBumper(Hand.kRight)){
      Autonomous.beginClimb();
+   }
+   //wrist controls
+   if(operator.getXButton() && !flopped){
+     Wrist.flop();
+   } else if(operator.getXButton() && flopped){
+     Wrist.unflop();
+   }
+   //Elevator controls
+   if(operator.getAButton()){
+     Elevator.goToLvl1();
    }
   }
 }
