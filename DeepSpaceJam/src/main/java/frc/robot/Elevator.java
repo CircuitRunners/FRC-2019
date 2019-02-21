@@ -14,6 +14,8 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 //import edu.wpi.first.wpilibj.Talon;
 /**
  * Add your docs here.
@@ -21,34 +23,36 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
  */
 public class Elevator {
     private static TalonSRX elevator;
-    private static int currentPosition = 0;
-    private static int desiredPosition = 0;
-
+    private static int currentPosition = 5893;
+    private static int desiredPosition = 5893;
     public static void init() {
-        elevator = new TalonSRX(9);
+        elevator = new TalonSRX(11);
         elevator.clearStickyFaults();
-        talonConfig(elevator, false);
+        talonConfig(elevator, true);
+        elevator.setSelectedSensorPosition(5893);
     }
 
-    public static void run(double leftTriggerInfo, double rightTriggerInfo) {
-        if (Math.abs(leftTriggerInfo) > 0.1) {
-            desiredPosition += 10 * leftTriggerInfo;
-        } else if (Math.abs(rightTriggerInfo) > 0.1) {
-            desiredPosition -= 10 * rightTriggerInfo;
-        } else if (Math.abs(rightTriggerInfo) > 0.1 && Math.abs(leftTriggerInfo) > 0.1) {
+    public static void run(double leftJoyInput) {
+        
+        if(Math.abs(leftJoyInput) > 0.1) {
+            desiredPosition += (leftJoyInput * 400);
         }
-
-        move(desiredPosition);
-
+        if(desiredPosition > toClicks(maxHeight)){
+            desiredPosition = maxHeight;
+        }
+        move((desiredPosition < 0)? 0:desiredPosition);
+        if(desiredPosition < 0){
+            desiredPosition = 0;
+        }
         currentPosition = elevator.getSelectedSensorPosition(elevPIDLoopIdx);
     }
 
     static int elevTimeoutMs = 10;
     static int elevPIDLoopIdx = 0;
     static int elevSlotIdx = 0;
-    static int elevCV = 15000;
+    static int elevCV = 18000;
     static int maxElevCV = 18000;
-    static int elevCA = 15000;
+    static int elevCA = 18000;
     static int maxElevCA = 18000;
 
     public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
@@ -87,12 +91,12 @@ public class Elevator {
 
     }
 
-    private static int maxHeight = 80; // inches
+    private static int maxHeight = 100; // inches
 
     private static void move(double position) {
         if (position != currentPosition) {
             if (position > toClicks(maxHeight)) {
-                elevator.set(ControlMode.MotionMagic, toClicks(maxHeight));
+                elevator.set(ControlMode.MotionMagic, desiredPosition);
             } else {
                 elevator.set(ControlMode.MotionMagic, desiredPosition);
             }
@@ -118,5 +122,8 @@ public class Elevator {
 
     public static void goToLvl3() {
         desiredPosition = 360;
+    }
+    public static void display(){
+       SmartDashboard.putNumber("Elevator Clicks",elevator.getSelectedSensorPosition());
     }
 }

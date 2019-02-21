@@ -36,7 +36,7 @@ public class Autonomous {
     private static void climb(){
         switch(step){
           case 1:
-          Wrist.unflop();
+          //Wrist.unflop();
           step++;
           break;
           case 2:

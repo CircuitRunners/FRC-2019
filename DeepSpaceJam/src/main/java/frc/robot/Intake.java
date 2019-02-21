@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import java.awt.geom.Ellipse2D.Double;
+
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -22,34 +24,31 @@ public class Intake {
     public static void init(){
         intake = new VictorSP(6);
     }
-    private static int power = 0;
+    private static double power = 0;
     public static void run(){
-        time = Timer.getFPGATimestamp();
-        if(endTime > time){
-            intake.set(power);
-        } else {
-            intake.stopMotor();
-        }
+        intake.set(power);
     }
     public static void in(){
-        endTime = time++;
-        power = 1;
+        
+        power = 0.6;
     }
     public static void in(int t){
-        endTime = time + t;
+        
         power = 1;
     }
     public static void out(){
-        endTime = time++;
-        power = -1;
+        
+        power = -0.6;
     } 
     public static void out(int t){
-        endTime = time + t;
+        
         power = -1;
     }
     public static void off(){
         power = 0;
     }
-
+    public static void idle(){
+        power = 0.3;
+    }
 
 }

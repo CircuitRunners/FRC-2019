@@ -20,4 +20,7 @@ public static final int AXIS_LTRIGGER = 2;
 public static final int AXIS_RTRIGGER = 3;
 public static final int AXIS_RIGHTX = 4;
 public static final int AXIS_RIGHTY = 5;
+
+public static final int LOGITECH_LEFTY = 1;
+public static final int LOGITECH_RIGHTY = 3;
 }

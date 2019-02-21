@@ -23,14 +23,15 @@ public class Drivebase{
     private static double prev_right = 0;
     public static void drive(double l, double r){
         //write/copy in drive code smoothing and safety methods
-        l = smooth(l, 0.1,0.9);
-        r = smooth(r,0.1,0.9);
+        l = smooth(l, 0.05,0.9);
+        r = smooth(r,0.05,0.9);
         l = safety(l, prev_left, 0.3);
         r = safety(r, prev_right, 0.3);
-        prev_left = l;
-        prev_right = r;
         left.set(l);
         right.set(r);
+        prev_left = l;
+        prev_right = r;
+
     }
     private static double safety(double cmdVal, double prevVal, double maxChange) {
 		double diff = cmdVal - prevVal;

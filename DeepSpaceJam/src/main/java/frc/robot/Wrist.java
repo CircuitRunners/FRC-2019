@@ -14,35 +14,48 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * Add your docs here.
  */
 public class Wrist {
     private static TalonSRX wrist;
-    private static TalonSRX wristSlave;
+	private static TalonSRX wristSlave;
+	private static int position = 0;
     public static void init(){
-        wrist = new TalonSRX(10);
-        wristSlave = new TalonSRX(11);
+        wrist = new TalonSRX(12);
+        wristSlave = new TalonSRX(13);
         wristSlave.follow(wrist);
-        talonConfig(wrist,true);
-        talonConfig(wristSlave,true);
-
-    }
-    private static boolean flopped = false;
+        talonConfig(wrist,false);
+        talonConfig(wristSlave,false);
+		wrist.setSelectedSensorPosition(0);
+	}
+	private static int desiredPosition = 0;
+	public static void run(double rightJoyInput){
+		desiredPosition += rightJoyInput * 30;
+		if(desiredPosition > 0){desiredPosition = 0;}
+		if(desiredPosition < -9900){desiredPosition = -9900;}
+		wrist.set(ControlMode.MotionMagic, desiredPosition);
+	}
+    //private static boolean flopped = true;
     public static void flop(){
-        wrist.set(ControlMode.MotionMagic,900);
+		position -= 30;
+		wrist.set(ControlMode.MotionMagic, position);
+		
 
-    }
-    public static void unflop(){
-        if(flopped){
-            wrist.set(ControlMode.MotionMagic, 0);
-        }
-    }
+	}
+	public static void up(){
+		wrist.set(ControlMode.MotionMagic,-20);
+	}
+	public static void out(){
+		wrist.set(ControlMode.MotionMagic, -900);
+	}
     public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
 		/* first choose the sensor */
 		thisTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Elevator.elevPIDLoopIdx,
 				Elevator.elevTimeoutMs);
-		thisTalon.setSensorPhase(!inverted);
+		thisTalon.setSensorPhase(inverted);
 		thisTalon.setInverted(inverted);
 
 		/* Set relevant frame periods to be at least as fast as periodic rate */
@@ -71,5 +84,9 @@ public class Wrist {
 		//thisTalon.configMotionCruiseVelocity((int) RobotData.elevCruiseVel, elevTimeoutMs);
 		//thisTalon.configMotionAcceleration((int) RobotData.elevCruiseAccel, elevTimeoutMs);
 
-    }
+	}
+	
+	public static void display(){
+		SmartDashboard.putNumber("Wrist Clicks",wrist.getSelectedSensorPosition());
+	}
 }

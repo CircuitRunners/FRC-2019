@@ -7,13 +7,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,25 +19,26 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
-  static Joystick driver = new Joystick(0);
-  static XboxController operator = new XboxController(1);
-  Compressor c = new Compressor(0);
-  //Joystick jumpBtn = new Joystick(1);
-  
+public class Robot extends IterativeRobot {
+  private static final String kDefaultAuto = "Default";
+  private static final String kCustomAuto = "My Auto";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  VictorSP motor;
+  VictorSP motor2;
+  VictorSP motor3;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   @Override
   public void robotInit() {
-    MyCamera.debug = true;
-    MyCamera.init();
-    Drivebase.init();
-    Elevator.init();
-    Wrist.init();
-    Intake.init();
-    HabClimber.init();
+    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+    m_chooser.addOption("My Auto", kCustomAuto);
+    SmartDashboard.putData("Auto choices", m_chooser);
+    motor = new VictorSP(0);
+    motor2 = new VictorSP(1);
+    motor3 = new VictorSP(2);
   }
 
   /**
@@ -53,9 +51,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    Elevator.display();
-    Wrist.display();
-    SmartDashboard.putNumber("correction angle", MyCamera.xAngle);
   }
 
   /**
@@ -71,6 +66,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    m_autoSelected = m_chooser.getSelected();
+    // autoSelected = SmartDashboard.getString("Auto Selector",
+    // defaultAuto);
+    System.out.println("Auto selected: " + m_autoSelected);
   }
 
   /**
@@ -78,8 +77,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    getControllers();
-    //Elevator.run(operator.getTriggerAxis(Hand.kLeft), operator.getTriggerAxis(Hand.kRight));
+    switch (m_autoSelected) {
+      case kCustomAuto:
+        // Put custom auto code here
+        break;
+      case kDefaultAuto:
+      default:
+        // Put default auto code here
+        break;
+    }
   }
 
   /**
@@ -87,10 +93,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    Elevator.run(-operator.getY(Hand.kLeft));
-    Intake.run();
-    Wrist.run(-operator.getY(Hand.kRight));
-    getControllers();
+    motor.set(.5);
+    motor2.set(0.5);
+    motor3.set(0.5);
   }
 
   /**
@@ -98,54 +103,5 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-  }
-  static boolean flopped = false;
-  int count = 0;
-  private void getControllers(){
-    //tracking controls
-    if(driver.getRawButton(Logitech.BTN_A) || !Drivebase.operatorControlled()){
-      MyCamera.startTracking();
-    } else {
-      MyCamera.stopTracking();
-    }
-    //drive controls
-   if(MyCamera.isTracking() && !Drivebase.operatorControlled()){
-      Drivebase.drive(.25+(MyCamera.xAngle/30), .25-(MyCamera.xAngle/30));
-   } else {
-     Drivebase.drive(driver.getRawAxis(Xbox.LOGITECH_LEFTY) - (driver.getRawAxis(Logitech.AXIS_RIGHTX) *.9),driver.getRawAxis(Xbox.LOGITECH_LEFTY) + (driver.getRawAxis(Logitech.AXIS_RIGHTX)*.9));
-   }
-   //HabClimber Controls
- 
-   if(operator.getBackButton()){
-    HabClimber.lower(HabClimber.BOTH);
-   } else if(operator.getStartButton()){
-     if(count < 100){
-      HabClimber.raise(HabClimber.BACK);
-      count++;
-     } else {
-       HabClimber.raise(HabClimber.FRONT);
-       count = 0;
-     }
-   }
- 
-   //Elevator/wrist controls
-   if(operator.getAButton()){
-     Elevator.goToLvl1();
-     Wrist.out();
-   } else if (operator.getBButton()){
-     Elevator.goToLvl2();
-     Wrist.up();
-   }
-
-   //intake controls
-   if(operator.getBumper(Hand.kRight)){
-     Intake.out();
-   } else if(operator.getBumper(Hand.kLeft)){
-     Intake.in();
-   }  else if (operator.getBumper(Hand.kLeft) && operator.getBumper(Hand.kRight)){
-      Intake.off();
-   } else {
-     Intake.idle();
-   }
   }
 }

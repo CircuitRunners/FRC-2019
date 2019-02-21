@@ -17,7 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MyCamera{
 	private static GripPipeline gripProcessor;
-    private static UsbCamera camServer;
+	private static UsbCamera trackingCam;
+	private static UsbCamera elevatorCam;
 	private static CvSink camSink;
 	private static CvSource liveFeed;
 	private static Mat mat;
@@ -54,16 +55,18 @@ public class MyCamera{
 	static int yCenter = 0;
 	static MatOfPoint contour;
 	static Rect box; 
-
+	static boolean isElevator =false;
     protected static void cameraOperation() {
 		frameNumber = 0;
-		camServer = CameraServer.getInstance().startAutomaticCapture("cam",0);
-		camServer.setResolution(640,480);
+		trackingCam = CameraServer.getInstance().startAutomaticCapture("cam",0);
+		trackingCam.setResolution(640,480);
+		elevatorCam = CameraServer.getInstance().startAutomaticCapture();
+		elevatorCam.setResolution(640, 480);
 		gripProcessor = new GripPipeline();
-		camSink = CameraServer.getInstance().getVideo(camServer);
+		camSink = CameraServer.getInstance().getVideo(isElevator? elevatorCam:trackingCam);
 		liveFeed = CameraServer.getInstance().putVideo("Live", frameWidth, frameHeight);
-		camServer.setBrightness(10);
-		camServer.setExposureManual(10);
+		trackingCam.setBrightness(10);
+		trackingCam.setExposureManual(10);
 		mat = new Mat();
 
 		while (!Thread.interrupted()) {
@@ -119,6 +122,10 @@ public class MyCamera{
 	}
 	public static boolean isTracking(){
 		return imageTracking;
+	}
+	public static void swapCams(){
+		isElevator = !isElevator;
+		camSink = CameraServer.getInstance().getVideo(isElevator? elevatorCam:trackingCam);
 	}
 
 }
