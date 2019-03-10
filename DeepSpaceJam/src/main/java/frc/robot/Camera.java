@@ -15,16 +15,16 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class MyCamera{
+public class Camera{
 	private static GripPipeline gripProcessor;
 	private static UsbCamera trackingCam;
-	private static UsbCamera elevatorCam;
+	//private static UsbCamera elevatorCam;
 	private static CvSink camSink;
 	private static CvSource liveFeed;
 	private static Mat mat;
 	private static int frameNumber = 0;
-	private static int frameWidth = 640;
-	private static int frameHeight = 480;
+	private static int frameWidth = 80;
+	private static int frameHeight = 60;
     //private static double frameDelay = 0.05;
     
     public static final double verticalFOV = 33.583;//half of the FOV (center to edge)
@@ -55,15 +55,16 @@ public class MyCamera{
 	static int yCenter = 0;
 	static MatOfPoint contour;
 	static Rect box; 
-	static boolean isElevator =false;
+	static boolean isElevator = false;
+
     protected static void cameraOperation() {
 		frameNumber = 0;
 		trackingCam = CameraServer.getInstance().startAutomaticCapture("cam",0);
-		trackingCam.setResolution(640,480);
-		elevatorCam = CameraServer.getInstance().startAutomaticCapture();
-		elevatorCam.setResolution(640, 480);
+		trackingCam.setResolution(frameWidth, frameHeight);
+		trackingCam.setFPS(30);
+
 		gripProcessor = new GripPipeline();
-		camSink = CameraServer.getInstance().getVideo(isElevator? elevatorCam:trackingCam);
+		camSink = CameraServer.getInstance().getVideo(trackingCam);
 		liveFeed = CameraServer.getInstance().putVideo("Live", frameWidth, frameHeight);
 		trackingCam.setBrightness(10);
 		trackingCam.setExposureManual(10);
@@ -77,13 +78,16 @@ public class MyCamera{
 				SmartDashboard.putNumber("Frame#:",++frameNumber);
 			}
 			if (!imageTracking) {
+				trackingCam.setBrightness(50);
+				trackingCam.setExposureAuto();
 				//liveFeed.putFrame(mat); 
 			} else {
+				trackingCam.setBrightness(10);
+				trackingCam.setExposureManual(10);
                 targetFound = false;
                 gripProcessor.process(mat);
 				contours = gripProcessor.filterContoursOutput();
 				numContours = contours.size();
-				
 				SmartDashboard.putNumber("NumContours", numContours);
 				if (numContours > 2) {
 					numContours = 2;
@@ -113,6 +117,9 @@ public class MyCamera{
 			}
 			Timer.delay(1/30);
 		}
+		if(Thread.interrupted()){
+			System.out.println("MyCamera: Critical Error, camera thread terminated.");
+		}
     }
     public static void startTracking() {
 		imageTracking = true;
@@ -122,10 +129,6 @@ public class MyCamera{
 	}
 	public static boolean isTracking(){
 		return imageTracking;
-	}
-	public static void swapCams(){
-		isElevator = !isElevator;
-		camSink = CameraServer.getInstance().getVideo(isElevator? elevatorCam:trackingCam);
 	}
 
 }

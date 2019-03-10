@@ -23,12 +23,12 @@ public class Drivebase{
     private static double prev_right = 0;
     public static void drive(double l, double r){
         //write/copy in drive code smoothing and safety methods
-        l = smooth(l, 0.05,0.9);
-        r = smooth(r,0.05,0.9);
+        l = smooth(l, 0.02,0.9);
+        r = smooth(r,0.02,0.9);
         l = safety(l, prev_left, 0.3);
         r = safety(r, prev_right, 0.3);
-        left.set(l);
-        right.set(r);
+        left.set(l* Robot.speed);
+        right.set(r* Robot.speed);
         prev_left = l;
         prev_right = r;
 
@@ -53,10 +53,10 @@ public class Drivebase{
 		else if (aValue < deadBand)
 			return 0;
 		else
-			return aValue * aValue * aValue * (value / aValue);
+			return aValue * aValue * (value / aValue);
     }
-    public static boolean operatorControlled(){
-        return !selfDriving;
+    public static boolean cameraControlled(){
+        return selfDriving;
     }
     public static void selfDrive(){
         selfDriving = true;

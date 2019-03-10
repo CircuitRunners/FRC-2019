@@ -33,23 +33,26 @@ public class Wrist {
 	}
 	private static int desiredPosition = 0;
 	public static void run(double rightJoyInput){
-		desiredPosition += rightJoyInput * 30;
-		if(desiredPosition > 0){desiredPosition = 0;}
+		if(Math.abs(rightJoyInput) > 0.1){
+			desiredPosition += rightJoyInput * 30;
+		}
+		if(desiredPosition > 30){desiredPosition = 30;}
 		if(desiredPosition < -9900){desiredPosition = -9900;}
-		wrist.set(ControlMode.MotionMagic, desiredPosition);
+		if(Elevator.wristOut){
+			desiredPosition = (desiredPosition >= -600)? -600:desiredPosition;
+		}
 	}
-    //private static boolean flopped = true;
-    public static void flop(){
-		position -= 30;
-		wrist.set(ControlMode.MotionMagic, position);
-		
-
+	private static void move(int filteredPosition){
+		if(position != desiredPosition){
+			wrist.set(ControlMode.MotionMagic, filteredPosition));
+		}
 	}
+    
 	public static void up(){
 		wrist.set(ControlMode.MotionMagic,-20);
 	}
 	public static void out(){
-		wrist.set(ControlMode.MotionMagic, -900);
+		wrist.set(ControlMode.MotionMagic, -3700);
 	}
     public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
 		/* first choose the sensor */

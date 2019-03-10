@@ -15,11 +15,11 @@ public class Autonomous {
     public static final int MODE_HATCH = 200;
     public static final int MODE_BALL = 300;
     private static int mode = 0;
-    private double x = MyCamera.xAngle;
+    private double x = Camera.xAngle;
     public static void run(){
         switch(mode){
             case MODE_CLIMB:
-            climb();
+            //climb();
             break;
             case MODE_BALL:
             break;
@@ -33,7 +33,7 @@ public class Autonomous {
         mode = MODE_CLIMB;
     }
     private static int step = 0;
-    private static void climb(){
+   /* private static void climb(){
         switch(step){
           case 1:
           //Wrist.unflop();
@@ -47,5 +47,5 @@ public class Autonomous {
           HabClimber.raise(HabClimber.BOTH);
         }
 
-    }   
+    }*/   
 }

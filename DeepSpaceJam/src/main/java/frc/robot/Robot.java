@@ -10,7 +10,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -26,7 +25,6 @@ public class Robot extends TimedRobot {
   static Joystick driver = new Joystick(0);
   static XboxController operator = new XboxController(1);
   Compressor c = new Compressor(0);
-  //Joystick jumpBtn = new Joystick(1);
   
   /**
    * This function is run when the robot is first started up and should be
@@ -34,41 +32,28 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    MyCamera.debug = true;
-    MyCamera.init();
+    Camera.debug = true;
+    Camera.init();
     Drivebase.init();
     Elevator.init();
     Wrist.init();
     Intake.init();
     HabClimber.init();
   }
-
+boolean debug = true;
   /**
-   * This function is called every robot packet, no matter the mode. Use
-   * this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before
-   * LiveWindow and SmartDashboard integrated updating.
+   * This function is called periodically while the robot is powered on.
    */
   @Override
   public void robotPeriodic() {
-    Elevator.display();
-    Wrist.display();
-    SmartDashboard.putNumber("correction angle", MyCamera.xAngle);
+    if(debug){
+      Elevator.display();
+      Wrist.display();
+      SmartDashboard.putNumber("correction angle", Camera.xAngle);
+    }
+
   }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select
-   * between different autonomous modes using the dashboard. The sendable
-   * chooser code works with the Java SmartDashboard. If you prefer the
-   * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-   * getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to
-   * the switch structure below with additional strings. If using the
-   * SendableChooser make sure to add them to the chooser code above as well.
-   */
   @Override
   public void autonomousInit() {
   }
@@ -78,9 +63,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    Elevator.run(-operator.getY(Hand.kLeft));
+    Intake.run();
+    Wrist.run(-operator.getY(Hand.kRight));
     getControllers();
-    //Elevator.run(operator.getTriggerAxis(Hand.kLeft), operator.getTriggerAxis(Hand.kRight));
-  }
+    }
 
   /**
    * This function is called periodically during operator control.
@@ -91,6 +78,7 @@ public class Robot extends TimedRobot {
     Intake.run();
     Wrist.run(-operator.getY(Hand.kRight));
     getControllers();
+    //Accelerometer.run();
   }
 
   /**
@@ -98,54 +86,80 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    Accelerometer.run();
+    controlHab();
+
   }
+  static boolean wasIntaking = true;
   static boolean flopped = false;
-  int count = 0;
+  public static double speed = 1.0;
   private void getControllers(){
     //tracking controls
-    if(driver.getRawButton(Logitech.BTN_A) || !Drivebase.operatorControlled()){
-      MyCamera.startTracking();
-    } else {
-      MyCamera.stopTracking();
+    if(driver.getRawButtonReleased(Logitech.BTN_A) || Drivebase.cameraControlled()){
+      Camera.startTracking();
+    } else if(driver.getRawButtonReleased(Logitech.BTN_A) && Camera.isTracking()){
+      Camera.stopTracking();
     }
     //drive controls
-   if(MyCamera.isTracking() && !Drivebase.operatorControlled()){
-      Drivebase.drive(.25+(MyCamera.xAngle/30), .25-(MyCamera.xAngle/30));
+   if(Camera.isTracking() && Drivebase.cameraControlled()){
+      Drivebase.drive(.25+(Camera.xAngle/30), .25-(Camera.xAngle/30));
    } else {
-     Drivebase.drive(driver.getRawAxis(Xbox.LOGITECH_LEFTY) - (driver.getRawAxis(Logitech.AXIS_RIGHTX) *.9),driver.getRawAxis(Xbox.LOGITECH_LEFTY) + (driver.getRawAxis(Logitech.AXIS_RIGHTX)*.9));
+     Drivebase.drive(driver.getRawAxis(Xbox.LOGITECH_LEFTY),driver.getRawAxis(Xbox.LOGITECH_RIGHTY));
+   }
+   if(driver.getRawButton(Logitech.BTN_RIGHT_TRIGGER)){
+     speed = 0.6;
+   } else {
+     speed = 1.0;
    }
    //HabClimber Controls
- 
+   /*
    if(operator.getBackButton()){
-    HabClimber.lower(HabClimber.BOTH);
+    HabClimber.move(HabClimber.BOTH,HabClimber.RETRACT);
    } else if(operator.getStartButton()){
-     if(count < 100){
-      HabClimber.raise(HabClimber.BACK);
-      count++;
-     } else {
-       HabClimber.raise(HabClimber.FRONT);
-       count = 0;
-     }
+     HabClimber.correctedRaise();
    }
- 
-   //Elevator/wrist controls
+ */
+   //Elevator/wrist controls (human control is in teleOp/auton loop)
    if(operator.getAButton()){
+     Wrist.out();
      Elevator.goToLvl1();
      Wrist.out();
    } else if (operator.getBButton()){
+     Wrist.out();
      Elevator.goToLvl2();
      Wrist.up();
+   } else if(operator.getYButton()){
+     Wrist.out();
+     Elevator.goToLvl3();
+     Wrist.up();
+   }
+   if(operator.getXButtonReleased()){
+    if(flopped){
+      flopped = !flopped;
+      Wrist.up();
+    } else {
+      flopped = !flopped;
+      Wrist.out();
+    }
    }
 
    //intake controls
+   
    if(operator.getBumper(Hand.kRight)){
      Intake.out();
+     wasIntaking = false;
    } else if(operator.getBumper(Hand.kLeft)){
      Intake.in();
-   }  else if (operator.getBumper(Hand.kLeft) && operator.getBumper(Hand.kRight)){
+     wasIntaking = true;
+   }  else if (!wasIntaking){
       Intake.off();
    } else {
      Intake.idle();
    }
+  }
+  public static void controlHab(){
+    /*if(operator.getStartButton()){
+      HabClimber.correctedRaise();
+    }*/
   }
 }
