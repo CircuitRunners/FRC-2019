@@ -44,7 +44,7 @@ public class Wrist {
 	}
 	private static void move(int filteredPosition){
 		if(position != desiredPosition){
-			wrist.set(ControlMode.MotionMagic, filteredPosition));
+			wrist.set(ControlMode.MotionMagic, filteredPosition);
 		}
 	}
     
@@ -52,7 +52,7 @@ public class Wrist {
 		wrist.set(ControlMode.MotionMagic,-20);
 	}
 	public static void out(){
-		wrist.set(ControlMode.MotionMagic, -3700);
+		wrist.set(ControlMode.MotionMagic, -5700);
 	}
     public static void talonConfig(TalonSRX thisTalon, boolean inverted) {
 		/* first choose the sensor */
@@ -91,5 +91,6 @@ public class Wrist {
 	
 	public static void display(){
 		SmartDashboard.putNumber("Wrist Clicks",wrist.getSelectedSensorPosition());
+		SmartDashboard.putNumber("Wrist Motor Controller output %",wrist.getMotorOutputPercent());
 	}
 }
