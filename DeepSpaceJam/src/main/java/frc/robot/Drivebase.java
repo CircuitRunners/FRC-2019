@@ -33,6 +33,7 @@ public class Drivebase{
         prev_right = r;
 
     }
+    //Brownout prevention, limits how quickly the motors can change speed and/or direction.
     private static double safety(double cmdVal, double prevVal, double maxChange) {
 		double diff = cmdVal - prevVal;
 		if (Math.abs(diff) < maxChange) {
@@ -46,6 +47,7 @@ public class Drivebase{
 		
         }
     }
+    //drive smoothing, allows for better driving 
     private static double smooth(double value, double deadBand, double max) {
 		double aValue = Math.abs(value);
 		if (aValue > max)
@@ -55,6 +57,7 @@ public class Drivebase{
 		else
 			return aValue * aValue * (value / aValue);
     }
+        //Cross-class code that allows the camera system to take over control of the drivebase.
     public static boolean cameraControlled(){
         return selfDriving;
     }

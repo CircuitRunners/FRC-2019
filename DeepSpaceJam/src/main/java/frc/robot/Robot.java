@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class Robot extends TimedRobot {
   static Joystick driver = new Joystick(0);
-  static XboxController operator = new XboxController(1);
+  static Joystick operator = new Joystick(1);
   Compressor c = new Compressor(0);
   
   /**
@@ -38,7 +38,8 @@ public class Robot extends TimedRobot {
     Elevator.init();
     Wrist.init();
     Intake.init();
-    HabClimber.init();
+    Pistons.init();
+    c.clearAllPCMStickyFaults();
   }
 boolean debug = true;
   /**
@@ -49,8 +50,8 @@ boolean debug = true;
     if(debug){
       Elevator.display();
       Wrist.display();
-      SmartDashboard.putNumber("correction angle", Camera.xAngle);
-    }
+      Camera.display();
+      }
 
   }
 
@@ -63,9 +64,9 @@ boolean debug = true;
    */
   @Override
   public void autonomousPeriodic() {
-    Elevator.run(-operator.getY(Hand.kLeft));
+    Elevator.run(-operator.getRawAxis(Logitech.AXIS_LEFTY));
     Intake.run();
-    Wrist.run(-operator.getY(Hand.kRight));
+    Wrist.run(-operator.getRawAxis(Logitech.AXIS_RIGHTY));
     getControllers();
     }
 
@@ -74,39 +75,38 @@ boolean debug = true;
    */
   @Override
   public void teleopPeriodic() {
-    Elevator.run(-operator.getY(Hand.kLeft));
+    Elevator.run(-operator.getRawAxis(Logitech.AXIS_LEFTY));
     Intake.run();
-    Wrist.run(-operator.getY(Hand.kRight));
+    Wrist.run(-operator.getRawAxis(Logitech.AXIS_RIGHTY));
     getControllers();
-    //Accelerometer.run();
   }
-
+  boolean tr = false;
   /**
    * This function is called periodically during test mode.
    */
   @Override
   public void testPeriodic() {
-    Accelerometer.run();
-    controlHab();
-
+    
   }
+
   static boolean wasIntaking = true;
   static boolean flopped = false;
   public static double speed = 1.0;
+
   private void getControllers(){
     //tracking controls
-    if(driver.getRawButtonReleased(Logitech.BTN_A) || Drivebase.cameraControlled()){
+    if(driver.getRawButtonPressed(Logitech.BTN_A) || Drivebase.cameraControlled()){
       Camera.startTracking();
-    } else if(driver.getRawButtonReleased(Logitech.BTN_A) && Camera.isTracking()){
+    } else if(driver.getRawButtonPressed(Logitech.BTN_B)){
       Camera.stopTracking();
     }
     //drive controls
-   if(Camera.isTracking() && Drivebase.cameraControlled()){
-      Drivebase.drive(.25+(Camera.xAngle/30), .25-(Camera.xAngle/30));
+   if(Camera.isTracking()){
+      Drivebase.drive(-0.5 + (Camera.xAngle/160), -0.5 - (Camera.xAngle/160));
    } else {
-     Drivebase.drive(driver.getRawAxis(Xbox.LOGITECH_LEFTY),driver.getRawAxis(Xbox.LOGITECH_RIGHTY));
+     Drivebase.drive(driver.getRawAxis(Logitech.AXIS_LEFTY),driver.getRawAxis(Logitech.AXIS_RIGHTY));
    }
-   if(driver.getRawButton(Logitech.BTN_RIGHT_TRIGGER)){
+   if(driver.getRawButton(Logitech.BTN_RIGHT_BUMPER)){
      speed = 0.6;
    } else {
      speed = 1.0;
@@ -120,20 +120,20 @@ boolean debug = true;
    }
  */
    //Elevator/wrist controls (human control is in teleOp/auton loop)
-   if(operator.getAButton()){
+   if(operator.getRawButton(Logitech.BTN_A)){
      Wrist.out();
      Elevator.goToLvl1();
      Wrist.out();
-   } else if (operator.getBButton()){
+   } else if (operator.getRawButton(Logitech.BTN_B)){
      Wrist.out();
      Elevator.goToLvl2();
      Wrist.up();
-   } else if(operator.getYButton()){
+   } else if(operator.getRawButton(Logitech.BTN_Y)){
      Wrist.out();
      Elevator.goToLvl3();
      Wrist.up();
    }
-   if(operator.getXButtonReleased()){
+   if(operator.getRawButtonReleased(Logitech.BTN_X)){
     if(flopped){
       flopped = !flopped;
       Wrist.up();
@@ -145,10 +145,10 @@ boolean debug = true;
 
    //intake controls
    
-   if(operator.getBumper(Hand.kRight)){
+   if(operator.getRawButton(Logitech.BTN_RIGHT_BUMPER)){
      Intake.out();
      wasIntaking = false;
-   } else if(operator.getBumper(Hand.kLeft)){
+   } else if(operator.getRawButton(Logitech.BTN_LEFT_BUMPER)){
      Intake.in();
      wasIntaking = true;
    }  else if (!wasIntaking){

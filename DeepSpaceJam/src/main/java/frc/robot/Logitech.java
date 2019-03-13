@@ -14,19 +14,19 @@ public class Logitech {
     //Thumbsticks
     public static final int AXIS_LEFTX = 0;
     public static final int AXIS_LEFTY = 1;
-    public static final int AXIS_RIGHTX = 2;
-    public static final int AXIS_RIGHTY = 3;
-    //Buttons
-    public static final int BTN_X = 1;
-    public static final int BTN_A = 2;
-    public static final int BTN_B = 3;
+    public static final int AXIS_LTRIGGER = 2;
+    public static final int AXIS_RTRIGGER = 3; 
+    public static final int AXIS_RIGHTX = 4;
+    public static final int AXIS_RIGHTY = 5;
+    //Buttons!!!WRONG, REMAP IMMEDIAELY!!!
+    public static final int BTN_A = 1;
+    public static final int BTN_B = 2;
+    public static final int BTN_X = 3;
     public static final int BTN_Y = 4;
     public static final int BTN_LEFT_BUMPER = 5;
     public static final int BTN_RIGHT_BUMPER = 6;
-    public static final int BTN_LEFT_TRIGGER = 7;
-    public static final int BTN_RIGHT_TRIGGER = 8;
-    public static final int BTN_BACK = 9;
-    public static final int BTN_START = 10;
-    public static final int BTN_LEFT_STICK = 11;
-    public static final int BTN_RIGHT_STICK = 12;
+    public static final int BTN_BACK = 7;
+    public static final int BTN_START = 8;
+    public static final int BTN_LEFT_STICK = 9;
+    public static final int BTN_RIGHT_STICK = 10;
 }
