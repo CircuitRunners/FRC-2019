@@ -107,7 +107,7 @@ public class Camera {
 				}
 
 			}
-			liveFeed.putFrame(mat);
+			//liveFeed.putFrame(mat);
 			Timer.delay(1 / 30);
 		}
 		if (Thread.interrupted()) {

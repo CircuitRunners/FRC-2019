@@ -40,6 +40,8 @@ public class Robot extends TimedRobot {
     Intake.init();
     Pistons.init();
     c.clearAllPCMStickyFaults();
+    c.setClosedLoopControl(false);
+    
   }
 boolean debug = true;
   /**
@@ -66,7 +68,7 @@ boolean debug = true;
   public void autonomousPeriodic() {
     Elevator.run(-operator.getRawAxis(Logitech.AXIS_LEFTY));
     Intake.run();
-    Wrist.run(-operator.getRawAxis(Logitech.AXIS_RIGHTY));
+    Wrist.run(-operator.getRawAxis(Logitech.AXIS_RIGHTY),-operator.getRawAxis(Logitech.AXIS_RTRIGGER));
     getControllers();
     }
 
@@ -77,7 +79,7 @@ boolean debug = true;
   public void teleopPeriodic() {
     Elevator.run(-operator.getRawAxis(Logitech.AXIS_LEFTY));
     Intake.run();
-    Wrist.run(-operator.getRawAxis(Logitech.AXIS_RIGHTY));
+    Wrist.run(-operator.getRawAxis(Logitech.AXIS_RIGHTY),-operator.getRawAxis(Logitech.AXIS_RTRIGGER));
     getControllers();
   }
   boolean tr = false;
@@ -91,7 +93,7 @@ boolean debug = true;
 
   static boolean wasIntaking = true;
   static boolean flopped = false;
-  public static double speed = 1.0;
+  public static double speed = 0.6;
 
   private void getControllers(){
     //tracking controls
@@ -106,11 +108,18 @@ boolean debug = true;
    } else {
      Drivebase.drive(driver.getRawAxis(Logitech.AXIS_LEFTY),driver.getRawAxis(Logitech.AXIS_RIGHTY));
    }
+   //Right bumper slows robot to 30%.
    if(driver.getRawButton(Logitech.BTN_RIGHT_BUMPER)){
+     speed = 0.3;
+   } 
+   //Left bumper press means speed is 100%.
+   else if (driver.getRawButton(Logitech.BTN_LEFT_BUMPER)){
+        speed = 1.0;
+    }
+    //No bumper press means speed is 60%.
+    else {
      speed = 0.6;
-   } else {
-     speed = 1.0;
-   }
+    }
    //HabClimber Controls
    /*
    if(operator.getBackButton()){
@@ -127,11 +136,13 @@ boolean debug = true;
    } else if (operator.getRawButton(Logitech.BTN_B)){
      Wrist.out();
      Elevator.goToLvl2();
-     Wrist.up();
+     Wrist.up();//!!!Not waiting on elevator command
    } else if(operator.getRawButton(Logitech.BTN_Y)){
      Wrist.out();
      Elevator.goToLvl3();
      Wrist.up();
+   } else if(operator.getRawButton(Logitech.BTN_LEFT_STICK)){
+     Elevator.setToCurrentPosition();
    }
    if(operator.getRawButtonReleased(Logitech.BTN_X)){
     if(flopped){

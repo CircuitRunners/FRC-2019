@@ -80,7 +80,7 @@ public class Elevator {
         thisTalon.config_kD(0, 0, elevTimeoutMs);
         /* set acceleration and vcruise velocity - see documentation */
         thisTalon.configMotionCruiseVelocity(elevCV, elevTimeoutMs);
-        thisTalon.configMotionAcceleration(elevCV, elevTimeoutMs);
+        thisTalon.configMotionAcceleration(elevCA, elevTimeoutMs);
         /* zero the sensor */
         thisTalon.setSelectedSensorPosition(0, elevPIDLoopIdx, elevTimeoutMs);
         thisTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
@@ -114,6 +114,9 @@ public static boolean wristOut = false;
     }
     public static void goToLvl3() {
         desiredPosition = maxHeight;
+    }
+    public static void setToCurrentPosition(){
+        desiredPosition = elevator.getSelectedSensorPosition();
     }
     public static void display(){
        SmartDashboard.putNumber("Elevator Clicks",elevator.getSelectedSensorPosition());
